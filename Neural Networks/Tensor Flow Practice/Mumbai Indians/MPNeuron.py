@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import math
+
 from IPython import display
 from matplotlib import cm
 from matplotlib import gridspec
@@ -12,8 +13,6 @@ from sklearn.metrics import accuracy_score
 import tensorflow as tf
 from tensorflow.python.data import Dataset
 from sklearn.model_selection import train_test_split
-from matplotlib import animation, rc
-from IPython.display import HTML
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
@@ -26,10 +25,6 @@ print (df)
 print (type(df)) 
 print ("--------------------------------------------------------------------------")
 print (df.describe())																		#Gives statitics of the data
-print ("--------------------------------------------------------------------------")
-df['Opening'] = df['Rohit'] + df['Quinton']
-df['Key_Runs'] = df['Rohit'] + df['Quinton'] + df['Surya'] + df['Pollard'] + df['Krunal'] + df['Hardik']		#Creating a column
-print (df)
 print ("--------------------------------------------------------------------------")
 
 
@@ -47,6 +42,7 @@ print ("------------------------------------------------------------------------
 """ Splitting Data for Training and Validation. """
 
 X = df.drop('Result',axis=1)
+X = df.drop('Total',axis=1)
 Y = df["Result"]
 
 
@@ -77,10 +73,8 @@ plt.show()
 """ Binarisation """
 X_binarised_train = X_train.apply(pd.cut,bins=2,labels=[0,1])
 X_binarised_test = X_test.apply(pd.cut,bins=2,labels=[0,1])
-X_train = X_train.values
-Y_train = Y_train.values
-X_test = X_test.values
-Y_test = Y_test.values		
+X_binarised_train = X_binarised_train.values
+X_binarised_test = X_binarised_test.values
 
 plt.plot(X_binarised_train.T ,'+')
 plt.plot(X_binarised_test.T ,'.')
@@ -88,16 +82,45 @@ plt.xticks(rotation='vertical')
 plt.show()
 
 
-""" Perceptron Class	""" 
+"""  Model """
 
-class Perceptron:
+acc = []
+for b in range(X_binarised_train.shape[1] + 1):
+	Y_pred_train = []
+	accurate_rows = 0
+	
+	for x,y in zip(X_binarised_train, Y_train):
+		y_pred = (np.sum(x) >= b)
+		Y_pred_train.append(y_pred)
+		accurate_rows += (y == y_pred)
+	
+	acc.append(accurate_rows)
+	
+b = np.argmax(acc)
+
+Y_pred_test = []
+accurate_rows = 0
+
+for x in X_binarised_test:
+	y_pred = (np.sum(x) >= b)
+	Y_pred_test.append(y_pred)
+	
+acc.append(accurate_rows)
+
+accuracy_test = accuracy_score(Y_pred_test,Y_test)
+print (accuracy_test)
+print ("--------------------------------------------------------------------------")
+
+
+""" MPNeuron Class	""" 
+
+class MPNeuron:
 	
 	def __init__(self):
-		self.w = None
 		self.b = None
 	
 	def model(self,x):
-		return 1 if (np.dot(self.w,x) >= self.b) else 0
+		return (sum(x) >= self.b)
 		
 	def predict(self,X):
 		Y = []
@@ -106,73 +129,23 @@ class Perceptron:
 			Y.append(output)
 		return np.array(Y)
 		
-	def fit(self,X,Y,epochs=1,lr=0.01):
-		self.w = np.ones(X.shape[1])
-		self.b = 0
+	def fit(self,X,Y):
 		accuracy = {}
-		max_accuracy = 0
-		wt_matrix = []
+		for b in range(X.shape[1] + 1):
+			self.b = b
+			Y_pred = self.predict(X)
+			accuracy[b] = accuracy_score(Y_pred,Y)
 		
-		for i in range(epochs):
-			for x,y in zip(X,Y):
-				y_pred = self.model(x)
-				
-				if (y==1 and y_pred==0):
-					self.w = self.w + lr*x
-					self.b = self.b + lr*1
-				elif (y==0 and y_pred==1):
-					self.w = self.w - x
-					self.b = self.b - 1	
-			
-			wt_matrix.append(self.w)
-			
-			accuracy[i] = accuracy_score(self.predict(X), Y)
-			if (accuracy[i] > max_accuracy):
-				max_accuracy = accuracy[i]
-				chkptw = self.w
-				chkptb = self.b
-				
-		self.w = chkptw
-		self.b = chkptb
+		best_b = max(accuracy, key=accuracy.get)
+		self.b = b
 		
-		print (max_accuracy)
-		plt.plot(accuracy.values())
-		plt.show()
+		print ("Optimal Value of b is ",best_b)
+		print ("Highest Accuracy for b is ",accuracy[best_b])
 		
-		return np.asarray(wt_matrix)
+		
+mp_neuron = MPNeuron()
+mp_neuron.fit(X_binarised_train,Y_train)
 
-			
-perceptron = Perceptron()
-wt_matrix = perceptron.fit(X_train, Y_train,25,0.11)
-
-plt.plot(perceptron.w)
-plt.show()
-
-Y_pred_train = perceptron.predict(X_train)
-accuracy_train = accuracy_score(Y_pred_train, Y_train)
-print ("Training Accuracy: ", accuracy_train)
-
-Y_pred_test = perceptron.predict(X_test)
-accuracy_test = accuracy_score(Y_pred_test, Y_test)
-print ("Test Accuracy: ", accuracy_test)
-
-
-
-""" Animation of Weights """
-
-fig, ax = plt.subplots()
-ax.set_xlim((0, wt_matrix.shape[1]))
-ax.set_ylim((-300, 300))
-line, = ax.plot([],[],lw=2)
-
-def animate(i):
-	a = wt_matrix.shape[0]
-	for i in range(a):
-		x = np.asarray(list(range(wt_matrix.shape[1])))
-		y = wt_matrix[i]
-		line.set_data(x,y)
-		return (line,)
-
-
-anim = animation.FuncAnimation(fig, animate, frames=100,interval=200, blit=True)
-#anim.save('Weights.gif')
+Y_test_pred = mp_neuron.predict(X_binarised_test)
+accuracy_test = accuracy_score(Y_test_pred,Y_test)
+print ("Test Accuracy is equal to ",accuracy_test)
