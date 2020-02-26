@@ -20,18 +20,18 @@ print (x.grad)
 print ()
 
 
-x = torch.ones([3, 2], requires_grad=True)
+x = tr.ones([3, 2], requires_grad=True)
 y = x + 5
-r = 1/(1 + torch.exp(-y))
+r = 1/(1 + tr.exp(-y))
 print(r)
-s = torch.sum(r)
+s = tr.sum(r)
 s.backward()
 print(x.grad)
 
 
-x = torch.ones([3, 2], requires_grad=True)
+x = tr.ones([3, 2], requires_grad=True)
 y = x + 5
-r = 1/(1 + torch.exp(-y))
-a = torch.ones([3, 2])
+r = 1/(1 + tr.exp(-y))
+a = tr.ones([3, 2])
 r.backward(a)
 print(x.grad)

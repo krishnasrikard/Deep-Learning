@@ -1,3 +1,6 @@
+"""
+The following code utilises TesnsorFlow 1.x
+"""
 from __future__ import print_function
 
 import math
@@ -17,7 +20,7 @@ from IPython.display import HTML
 from mpl_toolkits import mplot3d
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
 
-tf.logging.set_verbosity(tf.logging.ERROR)
+#tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
 
@@ -136,7 +139,7 @@ class SigmoidNeuron:
 				loss[i] = mean_squared_error(Y_pred.T,Y)
 				
 		if display_loss:
-			plt.plot(loss.values())
+			plt.plot(list(loss.values()))
 			plt.xlabel("Epochs")
 			plt.ylabel("Mean Squared Error")
 			plt.show()		

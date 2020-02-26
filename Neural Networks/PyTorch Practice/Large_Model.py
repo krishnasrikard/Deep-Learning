@@ -10,9 +10,9 @@ print ("..............................................................")
 
 
 # Without GPU
-learning_rate = 0.001
+learning_rate = 0.0001
 N = 10000
-epochs = 500
+epochs = 50
 
 w = torch.zeros([N], requires_grad=True)
 b = torch.ones([1], requires_grad=True)

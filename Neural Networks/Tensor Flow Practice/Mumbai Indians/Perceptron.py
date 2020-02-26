@@ -1,3 +1,6 @@
+"""
+The following code utilises TesnsorFlow 1.x
+"""
 from __future__ import print_function
 
 import math
@@ -136,7 +139,7 @@ class Perceptron:
 		self.b = chkptb
 		
 		print (max_accuracy)
-		plt.plot(accuracy.values())
+		plt.plot(list(accuracy.values()))
 		plt.show()
 		
 		return np.asarray(wt_matrix)
