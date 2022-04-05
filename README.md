@@ -1,10 +1,13 @@
 # Deep-Learning
 
-## Neural Networks
-Creating Neural Networks for Different Senerios and Datasets.
+## Tensorflow
+Getting Started, Solutions available online and simple projects with Tensorflow.
 
-## Upgrade Code to TensorFlow 2
-A code from TensorFlow website to upgrade the code to TensorFlow 2.
+## PyTorch
+Getting Started and simple projects with PyTorch.
+
+## TensorflowJS
+Getting Started and simple projects with TensorflowJS.
 
 ## Recurrent Units
-Understanding Recurrent Units
+Understanding Recurrent Units.
