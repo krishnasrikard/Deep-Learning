@@ -1,4 +1,4 @@
-# Deep-Learning
+# Learning-Deep-Learning
 
 ## Tensorflow
 Getting Started, Solutions available online and simple projects with Tensorflow.
